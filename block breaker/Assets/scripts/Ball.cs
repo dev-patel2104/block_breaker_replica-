@@ -1,0 +1,70 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+
+public class Ball : MonoBehaviour
+{
+    [SerializeField] Paddle paddle1;
+    [SerializeField] float xPush = 2f;
+    [SerializeField] float yPush = 14f;
+    [SerializeField] AudioClip[] mySounds;
+    [SerializeField] float velocitypush;
+
+    bool hasStarted = false;
+   
+
+    Vector2 vectorToBallDistance;
+    AudioSource myAudioSource;
+    Rigidbody2D myRigidBody2D;
+    level Level;
+    
+    
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+        vectorToBallDistance = transform.position - paddle1.transform.position;
+        myAudioSource = GetComponent<AudioSource>();
+        myRigidBody2D = GetComponent<Rigidbody2D>();
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (hasStarted == false)
+        {
+            LockTheBall();
+            LaunchTheBall();
+        }
+            
+    }
+
+    private void LockTheBall()
+    {
+        Vector2 PaddlePos = new Vector2(paddle1.transform.position.x, paddle1.transform.position.y);
+        transform.position = PaddlePos + vectorToBallDistance;
+    }
+
+    private void LaunchTheBall()
+    {
+        if (Input.GetMouseButtonDown(0)) 
+        {
+            myRigidBody2D.velocity = new Vector2(xPush,yPush);
+            hasStarted = true;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if(hasStarted == true)
+        {
+            Vector2 velocityTweak = new Vector2(Random.Range(0f, velocitypush), Random.Range(0f, velocitypush));
+            myRigidBody2D.velocity += velocityTweak;
+            AudioClip Clip = mySounds[Random.Range(0,mySounds.Length)];
+            myAudioSource.PlayOneShot(Clip);
+        }
+      
+    }
+}
